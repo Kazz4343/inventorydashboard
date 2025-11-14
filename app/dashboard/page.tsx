@@ -1,12 +1,26 @@
 import { prisma } from "@/lib/prima"
 import Sidebar from "../components/sidebar"
+import { getCurrentUser } from "@/lib/auth"
 
 
 async function DashboardPage () {
     
-    const totalProducts = await prisma.product.count({
-        
+    const user = await getCurrentUser()
+    const userId = user.id
+
+    const totalProducts = await prisma.product.count({ where: { userId} })
+    const lowStock = await prisma.product.count({
+        where: {
+            userId,
+        }
     })
+    const recent = await prisma.product.findMany({
+        where : { userId},
+        orderBy : {createAt: 'desc'},
+        take: 5
+    })
+
+    console.log(recent)
 
     return (
         <div className="min-h-screen bg-gray-50">
