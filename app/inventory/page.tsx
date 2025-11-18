@@ -11,13 +11,20 @@ async function InventoryPage ({searchParams}: {searchParams : Promise<{query?:st
     const params = await searchParams
     const query = (params.query ?? "").trim()
 
-    const totalProducts = await prisma.product.findMany({ 
-        where: { 
+    const where =  { 
             userId, 
-            name: {contains:query, mode: 'insensitive'} 
-        }})
+            ...(query ? {name: {contains:query, mode: 'insensitive' as const}} : '') 
+        }
 
-    
+    const [totalCount, items] = await Promise.all([
+        prisma.product.count({ where }),
+        prisma.product.findMany({
+            where
+        })
+    ])
+
+    const pageSize = 10
+    const totalPages = Math.max(1, Math.ceil(totalCount / pageSize))
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -61,7 +68,7 @@ async function InventoryPage ({searchParams}: {searchParams : Promise<{query?:st
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
-                                {totalProducts.map((p,i) => (
+                                {items.map((p,i) => (
                                     <tr key={i} className="hover:bg-gray-50">
                                         <td className="px-6 py-4 text-sm text-gray-500">{p.name}</td>
                                         <td className="px-6 py-4 text-sm text-gray-500">{p.sku || '-'}</td>
@@ -84,8 +91,11 @@ async function InventoryPage ({searchParams}: {searchParams : Promise<{query?:st
                             </tbody>
                         </table>
                     </div>
+                
+                    {totalPages > 1 && <div className="bg-white rounded-lg border border-gray-200 p-6">
+                        
+                    </div>}
                 </div>
-
             </main>
         </div>
     )
