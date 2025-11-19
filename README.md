@@ -5,6 +5,22 @@ A responsive inventory management dashboard for tracking products, stock levels,
 > 🔍 This project is focused on learning modern full-stack with a little bit of backed : Next.js, server components, Prisma ORM, and a simple but realistic inventory domain.
 
 ---
+## 📸 Screenshots
+
+### Landing Page
+![Landing Page](./public/screenshot/landingPage.png)
+
+### Dashboard
+![Dashboard](./public/screenshot/dashboard.png)
+
+### Add New Product
+![Add Product](./public/screenshot/addNewProduct.png)
+
+### Inventory Page
+![Inventory Page](./public/screenshot/inventory.png)
+
+### Signup Page
+![Signup Page](./public/screenshot/signupPage.png)
 
 ## ✨ Features
 

@@ -26,7 +26,7 @@ const Home = () => {
           Sign In
         </Link>
 
-        <Link href={'#'}
+        <Link href={'/dashboard'}
         className="bg-white
         text-purple-600
         px-8 py-3
@@ -37,7 +37,7 @@ const Home = () => {
         hover:bg-purple-500
         hover:text-white
         transition-colors">
-          Learn more
+          Dashboard
         </Link>
       </div>
     </div>
