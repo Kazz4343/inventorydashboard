@@ -1,15 +1,21 @@
 import { getCurrentUser } from "@/lib/auth"
 import Sidebar from "../components/sidebar"
 import { prisma } from "@/lib/prima"
-import deleteProduct from "@/lib/actions/products"
+import {deleteProduct} from "@/lib/actions/products"
+import Pagination from "../components/pagination"
 
-async function InventoryPage ({searchParams}: {searchParams : Promise<{query?:string}>}) {
+async function InventoryPage ({
+    searchParams
+} : {
+    searchParams : Promise<{query?:string, page?: string}>}) {
 
     const user = await getCurrentUser()
     const userId = user.id
 
     const params = await searchParams
     const query = (params.query ?? "").trim()
+    const pageSize = 10
+    const page = Math.max(1, Number(params.page ?? 1))
 
     const where =  { 
             userId, 
@@ -17,15 +23,17 @@ async function InventoryPage ({searchParams}: {searchParams : Promise<{query?:st
         }
 
     const [totalCount, items] = await Promise.all([
-        prisma.product.count({ where }),
-        prisma.product.findMany({
-            where
-        })
-    ])
+    prisma.product.count({ where }),
+    prisma.product.findMany({
+      where,
+      orderBy: { createAt: "desc" },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+  ]);
 
-    const pageSize = 10
-    const totalPages = Math.max(1, Math.ceil(totalCount / pageSize))
-
+    const totalPages = Math.max(1, Math.ceil(totalCount / pageSize))    
+    
     return (
         <div className="min-h-screen bg-gray-50">
             <Sidebar currentPath="/inventory"/>
@@ -93,7 +101,14 @@ async function InventoryPage ({searchParams}: {searchParams : Promise<{query?:st
                     </div>
                 
                     {totalPages > 1 && <div className="bg-white rounded-lg border border-gray-200 p-6">
-                        
+                        <Pagination 
+                        currentPages={page} 
+                        totalPages={totalPages} 
+                        baseUrl="/inventory" 
+                        searchParams={{
+                            query,
+                            pageSize: String(pageSize)
+                        }}/>
                     </div>}
                 </div>
             </main>
